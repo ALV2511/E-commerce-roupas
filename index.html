@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Loja de Roupas</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+
+  <header class="bg-white border-b sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      <h1 class="text-2xl font-black tracking-wider uppercase">UrbanStyle</h1>
+      
+      <button onclick="alternarCarrinho()" class="relative p-2 text-gray-700 hover:text-black">
+        <i data-lucide="shopping-bag" class="w-6 h-6"></i>
+        <span id="contador-carrinho" class="absolute -top-1 -right-1 bg-black text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">0</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 py-8">
+    <h2 class="text-2xl font-bold mb-6">Lançamentos</h2>
+    
+    <div id="grade-produtos" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+      </div>
+  </main>
+
+  <div id="carrinho-painel" class="fixed inset-y-0 right-0 w-80 bg-white shadow-2xl transform translate-x-full transition-transform duration-300 z-50 p-6 flex flex-col">
+    <div class="flex items-center justify-between border-b pb-4">
+      <h3 class="text-lg font-bold">Seu Carrinho</h3>
+      <button onclick="alternarCarrinho()" class="text-gray-500 hover:text-black">
+        <i data-lucide="x" class="w-6 h-6"></i>
+      </button>
+    </div>
+
+    <div id="itens-carrinho" class="flex-1 overflow-y-auto py-4 space-y-4">
+      <p class="text-gray-500 text-center py-8">Seu carrinho está vazio.</p>
+    </div>
+
+    <div class="border-t pt-4">
+      <div class="flex justify-between font-bold text-lg mb-4">
+        <span>Total:</span>
+        <span id="total-carrinho">R$ 0,00</span>
+      </div>
+      <button class="w-full bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-800 transition">
+        Finalizar Compra
+      </button>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
