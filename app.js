@@ -1,5 +1,5 @@
 // 1. CONEXÃO COM O SUPABASE
-const SUPABASE_URL = "https://rtzlswsbywvqpeynzfqt.supabase.co/rest/v1/";
+const SUPABASE_URL = "https://rtzlswsbywvqpeynzfqt.supabase.co";
 // Cole aqui a sua Publishable Key completa que copiou do painel:
 const SUPABASE_KEY = "sb_publishable_xKFbqTiOkI2jrp3670_tNw_N9pQWy1M"; 
 
