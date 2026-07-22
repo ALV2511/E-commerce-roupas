@@ -6,24 +6,26 @@ $host = 'aws-0-us-east-2.pooler.supabase.com'; // Altere para a região da sua c
 $port = '6543';                                // Porta oficial do Supabase Transaction Pooler
 $db   = 'postgres';
 $user = 'postgres.rtzlswsbywvqpeynzfqt';        // Formato correto do usuário: postgres.ID_DO_PROJETO
-$pass = 'K9#mx!L82$vP@qZ7';                      // ⚠️ COLOQUE AQUI A SENHA DO SEU BANCO NO SUPABASE
+$pass = 'SUA_SENHA_AQUI';                      // ⚠️ COLOQUE AQUI A SENHA DO SEU BANCO NO SUPABASE
 
 $dsn = "pgsql:host=$host;port=$port;dbname=$db;";
 
-$produtos = [];$erro = null;
+$produtos = [];
+$erro = null;
 
 try {
     // Conexão segura com PDO
-    $pdo = new PDO($dsn, $user,$pass, [
+    $pdo = new PDO($dsn, $user, $pass, [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
     ]);
 
     // Busca todos os produtos da tabela
-    $stmt =$pdo->query('SELECT * FROM produtos');
-    $produtos =$stmt->fetchAll();
+    $stmt = $pdo->query('SELECT * FROM produtos');
+    $produtos = $stmt->fetchAll();
 
-} catch (PDOException $e) {$erro = "Erro ao conectar com o banco de dados: " . $e->getMessage();
+} catch (PDOException $e) {
+    $erro = "Erro ao conectar com o banco de dados: " . $e->getMessage();
 }
 ?>
 
@@ -56,11 +58,29 @@ try {
       <?php if (empty($produtos) && !$erro): ?>
         <p class="text-gray-500 col-span-3 text-center py-8">Nenhum produto cadastrado no banco de dados.</p>
       <?php else: ?>
-        <?php foreach ($produtos as$prod): ?>
+        <?php foreach ($produtos as $prod): ?>
           <div class="bg-white rounded-lg shadow-sm border p-4 flex flex-col justify-between">
             <div>
               <?php if (!empty($prod['imagem'])): ?>
                 <img src="<?php echo htmlspecialchars($prod['imagem']); ?>" alt="<?php echo htmlspecialchars($prod['nome']); ?>" class="w-full h-64 object-cover rounded-md mb-4">
               <?php endif; ?>
               <h3 class="font-semibold text-lg leading-tight mb-1"><?php echo htmlspecialchars($prod['nome']); ?></h3>
-              <p class="
+              <p class="text-gray-900 font-bold mb-3">R$ <?php echo number_format($prod['preco'], 2, ',', '.'); ?></p>
+            </div>
+            
+            <div>
+              <label class="block text-xs font-medium text-gray-500 mb-1">Tamanhos disponíveis:</label>
+              <p class="text-sm bg-gray-100 p-2 rounded mb-3 font-mono"><?php echo htmlspecialchars($prod['tamanhos']); ?></p>
+              
+              <button class="w-full bg-black text-white py-2 rounded-md font-medium text-sm hover:bg-gray-800 transition">
+                Comprar
+              </button>
+            </div>
+          </div>
+        <?php endforeach; ?>
+      <?php endif; ?>
+    </div>
+  </main>
+
+</body>
+</html>
