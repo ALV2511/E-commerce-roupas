@@ -1,12 +1,12 @@
 <?php
 // ==============================================================================
-// CONFIGURAÇÃO DA CONEXÃO VIA SUPABASE POOLER (Suporta a rede do Render / IPv4)
+// CONFIGURAÇÃO DE CONEXÃO COM O SUPABASE (Via Pooler IPv4 para o Render)
 // ==============================================================================
-$host = 'aws-0-us-east-2.pooler.supabase.com'; // Altere para a região da sua conta se for diferente de us-east-2
-$port = '5432';                                // Porta oficial do Supabase Transaction Pooler
+$host = 'aws-0-us-east-2.pooler.supabase.com'; // Host Pooler para US East (Ohio)
+$port = '6543';                                // Porta do Transaction Pooler
 $db   = 'postgres';
-$user = 'postgres.rtzlswsbywvqpeynzfqt';        // Formato correto do usuário: postgres.ID_DO_PROJETO
-$pass = 'MinhaLoja2026#Segura';                      // ⚠️ COLOQUE AQUI A SENHA DO SEU BANCO NO SUPABASE
+$user = 'postgres.rtzlswsbywvqpeynzfqt';        // ID do projeto anexado para autenticação no Pooler
+$pass = 'MinhaLoja2026#Segura';                // Sua senha redefinida
 
 $dsn = "pgsql:host=$host;port=$port;dbname=$db;";
 
@@ -14,14 +14,13 @@ $produtos = [];
 $erro = null;
 
 try {
-    // Conexão segura com PDO
     $pdo = new PDO($dsn, $user, $pass, [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
     ]);
 
-    // Busca todos os produtos da tabela
-    $stmt = $pdo->query('SELECT * FROM produtos');
+    // Busca os produtos da tabela "produtos"
+    $stmt = $pdo->query('SELECT id, nome, imagem, tamanhos, preço FROM produtos');
     $produtos = $stmt->fetchAll();
 
 } catch (PDOException $e) {
@@ -56,7 +55,7 @@ try {
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
       <?php if (empty($produtos) && !$erro): ?>
-        <p class="text-gray-500 col-span-3 text-center py-8">Nenhum produto cadastrado no banco de dados.</p>
+        <p class="text-gray-500 col-span-3 text-center py-8">Nenhum produto cadastrado na tabela ainda.</p>
       <?php else: ?>
         <?php foreach ($produtos as $prod): ?>
           <div class="bg-white rounded-lg shadow-sm border p-4 flex flex-col justify-between">
@@ -64,13 +63,21 @@ try {
               <?php if (!empty($prod['imagem'])): ?>
                 <img src="<?php echo htmlspecialchars($prod['imagem']); ?>" alt="<?php echo htmlspecialchars($prod['nome']); ?>" class="w-full h-64 object-cover rounded-md mb-4">
               <?php endif; ?>
-              <h3 class="font-semibold text-lg leading-tight mb-1"><?php echo htmlspecialchars($prod['nome']); ?></h3>
-              <p class="text-gray-900 font-bold mb-3">R$ <?php echo number_format($prod['preco'], 2, ',', '.'); ?></p>
+              
+              <h3 class="font-semibold text-lg leading-tight mb-1">
+                <?php echo htmlspecialchars($prod['nome']); ?>
+              </h3>
+              
+              <p class="text-gray-900 font-bold mb-3">
+                R$ <?php echo number_format($prod['preço'], 2, ',', '.'); ?>
+              </p>
             </div>
             
             <div>
               <label class="block text-xs font-medium text-gray-500 mb-1">Tamanhos disponíveis:</label>
-              <p class="text-sm bg-gray-100 p-2 rounded mb-3 font-mono"><?php echo htmlspecialchars($prod['tamanhos']); ?></p>
+              <p class="text-sm bg-gray-100 p-2 rounded mb-3 font-mono">
+                <?php echo htmlspecialchars($prod['tamanhos']); ?>
+              </p>
               
               <button class="w-full bg-black text-white py-2 rounded-md font-medium text-sm hover:bg-gray-800 transition">
                 Comprar
