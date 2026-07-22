@@ -6,7 +6,7 @@ $host = 'aws-0-us-east-2.pooler.supabase.com'; // Altere para a região da sua c
 $port = '5432';                                // Porta oficial do Supabase Transaction Pooler
 $db   = 'postgres';
 $user = 'postgres.rtzlswsbywvqpeynzfqt';        // Formato correto do usuário: postgres.ID_DO_PROJETO
-$pass = 'K9#mx!L82$vP@qZ7';                      // ⚠️ COLOQUE AQUI A SENHA DO SEU BANCO NO SUPABASE
+$pass = 'MinhaLoja2026#Segura';                      // ⚠️ COLOQUE AQUI A SENHA DO SEU BANCO NO SUPABASE
 
 $dsn = "pgsql:host=$host;port=$port;dbname=$db;";
 
