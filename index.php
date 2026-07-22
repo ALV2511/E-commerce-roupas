@@ -3,7 +3,7 @@
 // CONFIGURAÇÃO DA CONEXÃO VIA SUPABASE POOLER (Suporta a rede do Render / IPv4)
 // ==============================================================================
 $host = 'aws-0-us-east-2.pooler.supabase.com'; // Altere para a região da sua conta se for diferente de us-east-2
-$port = '6543';                                // Porta oficial do Supabase Transaction Pooler
+$port = '5432';                                // Porta oficial do Supabase Transaction Pooler
 $db   = 'postgres';
 $user = 'postgres.rtzlswsbywvqpeynzfqt';        // Formato correto do usuário: postgres.ID_DO_PROJETO
 $pass = 'K9#mx!L82$vP@qZ7';                      // ⚠️ COLOQUE AQUI A SENHA DO SEU BANCO NO SUPABASE
