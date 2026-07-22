@@ -1,30 +1,29 @@
 <?php
 // ==============================================================================
-// CONFIGURAÇÃO DE CONEXÃO COM O SUPABASE (Via Pooler IPv4 para o Render)
+// CONEXÃO VIA API REST DO SUPABASE (Funciona no Render sem erro de banco/IPv6)
 // ==============================================================================
-$host = 'aws-0-us-east-2.pooler.supabase.com'; // Host Pooler para US East (Ohio)
-$port = '6543';                                // Porta do Transaction Pooler
-$db   = 'postgres';
-$user = 'postgres.rtzlswsbywvqpeynzfqt';        // ID do projeto anexado para autenticação no Pooler
-$pass = 'MinhaLoja2026#Segura';                // Sua senha redefinida
-
-$dsn = "pgsql:host=$host;port=$port;dbname=$db;";
+$supabaseUrl = 'https://rtzlswsbywvqpeynzfqt.supabase.co';
+$supabaseKey = 'sb_publishable_xKFbqTiOkI2jrp3670_tNw_N9pQWy1M'; // Pegue em Project Settings -> API no Supabase
 
 $produtos = [];
 $erro = null;
 
-try {
-    $pdo = new PDO($dsn, $user, $pass, [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
-    ]);
+// Requisição HTTP para a API REST da tabela 'produtos'
+$opts = [
+    "http" => [
+        "method" => "GET",
+        "header" => "apikey: " . $supabaseKey . "\r\n" .
+                    "Authorization: Bearer " . $supabaseKey . "\r\n"
+    ]
+];
 
-    // Busca os produtos da tabela "produtos"
-    $stmt = $pdo->query('SELECT id, nome, imagem, tamanhos, preço FROM produtos');
-    $produtos = $stmt->fetchAll();
+$context = stream_context_create($opts);
+$response = @file_get_contents($supabaseUrl . "/rest/v1/produtos?select=*", false, $context);
 
-} catch (PDOException $e) {
-    $erro = "Erro ao conectar com o banco de dados: " . $e->getMessage();
+if ($response !== false) {
+    $produtos = json_decode($response, true);
+} else {
+    $erro = "Não foi possível carregar os produtos via API do Supabase.";
 }
 ?>
 
@@ -69,7 +68,7 @@ try {
               </h3>
               
               <p class="text-gray-900 font-bold mb-3">
-                R$ <?php echo number_format($prod['preço'], 2, ',', '.'); ?>
+                R$ <?php echo number_format($prod['preço'] ?? $prod['preco'] ?? 0, 2, ',', '.'); ?>
               </p>
             </div>
             
