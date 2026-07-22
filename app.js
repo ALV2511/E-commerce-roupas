@@ -1,34 +1,51 @@
-// 1. DADOS DOS PRODUTOS (Simulando o banco de dados)
-const produtos = [
-  {
-    id: 1,
-    nome: "Camiseta Oversized Streetwear",
-    preco: 119.90,
-    tamanhos: ["P", "M", "G", "GG"],
-    imagem: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=500&auto=format&fit=crop"
-  },
-  {
-    id: 2,
-    nome: "Calça Cargo Utilitária",
-    preco: 219.90,
-    tamanhos: ["38", "40", "42"],
-    imagem: "https://images.unsplash.com/photo-1517445312882-bc9910d016b7?w=500&auto=format&fit=crop"
-  },
-  {
-    id: 3,
-    nome: "Moletom Canguru Off-White",
-    preco: 259.90,
-    tamanhos: ["M", "G"],
-    imagem: "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=500&auto=format&fit=crop"
-  }
-];
+// 1. CONEXÃO COM O SUPABASE
+const SUPABASE_URL = "https://rtzlswsbywvqpeynzfqt.supabase.co/rest/v1/";
+// Cole aqui a sua Publishable Key completa que copiou do painel:
+const SUPABASE_KEY = "sb_publishable_xKFbqTiOkI2jrp3670_tNw_N9pQWy1M"; 
 
+// Inicializa o cliente através do objeto global do CDN
+const { createClient } = window.supabase;
+const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let produtos = [];
 let carrinho = [];
 
-// 2. DESENHAR OS PRODUTOS NA TELA
+// 2. BUSCAR PRODUTOS DO BANCO DE DADOS (SUPABASE)
+async function carregarProdutosDoBanco() {
+  const container = document.getElementById("grade-produtos");
+  container.innerHTML = `<p class="text-gray-500 col-span-3 text-center py-8">A carregar produtos...</p>`;
+
+  // Procura todos os registos da tabela 'produtos'
+  const { data, error } = await _supabase
+    .from('produtos')
+    .select('*');
+
+  if (error) {
+    console.error('Erro ao carregar produtos do Supabase:', error);
+    container.innerHTML = `<p class="text-red-500 col-span-3 text-center py-8">Erro ao carregar os produtos.</p>`;
+    return;
+  }
+
+  // Converte a string de tamanhos ("P, M, G") num Array do JS (["P", "M", "G"])
+  produtos = data.map(prod => ({
+    ...prod,
+    tamanhos: typeof prod.tamanhos === 'string' 
+      ? prod.tamanhos.split(',').map(t => t.trim()) 
+      : (prod.tamanhos || ["Único"])
+  }));
+
+  renderizarProdutos();
+}
+
+// 3. DESENHAR OS PRODUTOS NA TELA
 function renderizarProdutos() {
   const container = document.getElementById("grade-produtos");
   container.innerHTML = "";
+
+  if (produtos.length === 0) {
+    container.innerHTML = `<p class="text-gray-500 col-span-3 text-center py-8">Nenhum produto encontrado na base de dados.</p>`;
+    return;
+  }
 
   produtos.forEach(prod => {
     container.innerHTML += `
@@ -36,7 +53,7 @@ function renderizarProdutos() {
         <div>
           <img src="${prod.imagem}" alt="${prod.nome}" class="w-full h-64 object-cover rounded-md mb-4">
           <h3 class="font-semibold text-lg leading-tight mb-1">${prod.nome}</h3>
-          <p class="text-gray-900 font-bold mb-3">R$ ${prod.preco.toFixed(2).replace('.', ',')}</p>
+          <p class="text-gray-900 font-bold mb-3">R$ ${Number(prod.preco).toFixed(2).replace('.', ',')}</p>
         </div>
         
         <div>
@@ -55,11 +72,13 @@ function renderizarProdutos() {
     `;
   });
 
-  // Atualiza os ícones da tela
-  lucide.createIcons();
+  // Atualiza os ícones da biblioteca Lucide
+  if (window.lucide) {
+    lucide.createIcons();
+  }
 }
 
-// 3. LÓGICA DO CARRINHO
+// 4. LÓGICA DO CARRINHO
 function adicionarAoCarrinho(idProduto) {
   const produto = produtos.find(p => p.id === idProduto);
   const tamanho = document.getElementById(`tamanho-${idProduto}`).value;
@@ -80,13 +99,11 @@ function atualizarCarrinho() {
   const contador = document.getElementById("contador-carrinho");
   const totalElemento = document.getElementById("total-carrinho");
 
-  // Atualiza contador de itens
   const totalQtd = carrinho.reduce((sum, item) => sum + item.quantidade, 0);
   contador.innerText = totalQtd;
 
-  // Atualiza lista visual
   if (carrinho.length === 0) {
-    containerItens.innerHTML = `<p class="text-gray-500 text-center py-8">Seu carrinho está vazio.</p>`;
+    containerItens.innerHTML = `<p class="text-gray-500 text-center py-8">O seu carrinho está vazio.</p>`;
     totalElemento.innerText = "R$ 0,00";
     return;
   }
@@ -110,11 +127,10 @@ function atualizarCarrinho() {
   totalElemento.innerText = `R$ ${valorTotal.toFixed(2).replace('.', ',')}`;
 }
 
-// 4. ABRIR E FECHAR O PAINEL DO CARRINHO
 function alternarCarrinho() {
   const painel = document.getElementById("carrinho-painel");
   painel.classList.toggle("translate-x-full");
 }
 
-// Inicializar a aplicação
-renderizarProdutos();
+// Executa a busca na base de dados assim que a página carrega
+carregarProdutosDoBanco();
